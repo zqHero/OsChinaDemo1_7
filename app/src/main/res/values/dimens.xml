@@ -4,8 +4,25 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
 
+    <dimen name="text_size_10">10.0dip</dimen>
 
     <dimen name="text_size_19">19.0dip</dimen>
+
+
+
+
+
+    <dimen name="space_9">9.0dip</dimen>
+    <dimen name="space_8">8.0dip</dimen>
+    <dimen name="space_7">7.0dip</dimen>
+    <dimen name="space_6">6.0dip</dimen>
+    <dimen name="space_5">5.0dip</dimen>
+    <dimen name="space_4">4.0dip</dimen>
+    <dimen name="space_3">3.0dip</dimen>
+    <dimen name="space_2">2.0dip</dimen>
+    <dimen name="space_1">1.0dip</dimen>
+
+
 
 
 </resources>
