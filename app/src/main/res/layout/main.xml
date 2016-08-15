@@ -9,9 +9,7 @@
 
     <include layout="@layout/main_header"/>
 
-    <!--
-
-    <net.oschina.app.widget.ScrollLayout
+    <com.hero.zhaoq.oschinademo1_7.widget.ScrollLayout
 		  android:id="@+id/main_scrolllayout"
 		  android:layout_width="fill_parent"
 		  android:layout_height="fill_parent"
@@ -25,10 +23,8 @@
 
             <include layout="@layout/frame_active" />
 
-    </net.oschina.app.widget.ScrollLayout>
-   -->
+    </com.hero.zhaoq.oschinademo1_7.widget.ScrollLayout>
 
     <include layout="@layout/main_footer" />
-
 
 </LinearLayout>

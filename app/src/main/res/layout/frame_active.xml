@@ -34,13 +34,13 @@
          	android:text="@string/frame_title_active_message"/>
 	</LinearLayout>
 	
-	<net.oschina.app.widget.PullToRefreshListView
-	  	android:id="@+id/frame_listview_active"
-	    style="@style/widget_listview"/>
+	<!--<net.oschina.app.widget.PullToRefreshListView-->
+	  	<!--android:id="@+id/frame_listview_active"-->
+	    <!--style="@style/widget_listview"/>-->
 	
-	<net.oschina.app.widget.PullToRefreshListView
-	  	android:id="@+id/frame_listview_message"
-	    style="@style/widget_listview"
-	    android:divider="@null"
-		android:visibility="gone"/>
+	<!--<net.oschina.app.widget.PullToRefreshListView-->
+	  	<!--android:id="@+id/frame_listview_message"-->
+	    <!--style="@style/widget_listview"-->
+	    <!--android:divider="@null"-->
+		<!--android:visibility="gone"/>-->
 </LinearLayout>

@@ -13,7 +13,8 @@
 
     <color name="frame_button_text_nor">#033a5c</color>
     <color name="frame_button_text_select">#FFFFFF</color>
-
+    <color name="listitem_gray">#ff9da19e</color>
     <color name="listitem_transparent">#00000000</color>
+    <color name="listitem_black">#ff000000</color>
 
 </resources>

@@ -18,19 +18,6 @@ import android.widget.Scroller;
  */
 public class ScrollLayout extends ViewGroup{
 
-    Scroller mScroller = null;//  Android里Scroller类是为了实现View平滑滚动的一个Helper类。
-    private int mCurScreen;
-    private int mDefaultScreen = 0 ;
-    private int mTouchSlop;//手指滑动  的距离  大于这个距离  到下一页
-
-    /**
-     * 设置    是否  可以滑动
-     */
-    private boolean isScroll = true;
-    public void setIsScroll(boolean b){
-        this.isScroll = b;
-    }
-
     public ScrollLayout(Context context, AttributeSet attrs) {
         //调用   本地后遭方法   用于  xml文件中创建布局
         this(context, attrs,0);
@@ -44,6 +31,25 @@ public class ScrollLayout extends ViewGroup{
         //getScaledTouchSlop是一个距离，表示滑动的时候，手的移动要大于这个距离才开始移动控件。
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledDoubleTapSlop();
     }
+
+    Scroller mScroller = null;//  Android里Scroller类是为了实现View平滑滚动的一个Helper类。
+    private int mCurScreen;
+    private int mDefaultScreen = 0 ;
+    private int mTouchSlop;//手指滑动  的距离  大于这个距离  到下一页
+
+
+    public int getCurScreen() {
+        return mCurScreen;
+    }
+
+    /**
+     * 设置    是否  可以滑动
+     */
+    private boolean isScroll = true;
+    public void setIsScroll(boolean b){
+        this.isScroll = b;
+    }
+
 
     //实现  该方法  onLayout方法是ViewGroup中子View的布局方法，用于放置子View的位置。
     @Override
@@ -169,11 +175,96 @@ public class ScrollLayout extends ViewGroup{
         return true;
     }
 
-    //切换到   目标  子布局
-    private void snapToDestination() {
+    //切换   当前显示的子布局
+    public void snapToScreen(int whitchScreen) {
+        //是否可滑动
+        if(!isScroll){
+            this.setToScreen(whitchScreen);
+            return;
+        }
+        scrollToScreen(whitchScreen);
     }
 
-    //切换   当前显示的子布局
-    private void snapToScreen(int i) {
+    //
+    public void setToScreen(int whitchScreen){
+        whitchScreen = Math.max(0,Math.min(whitchScreen,getChildCount()-1));
+        mCurScreen = whitchScreen;
+        scrollTo(whitchScreen * getWidth(),0);
+
+        if(mOnViewChangeListener != null){
+            mOnViewChangeListener.OnViewChange(mCurScreen);
+        }
+    }
+
+    //滑动到新的界面
+    private void scrollToScreen(int whitchScreen) {
+        whitchScreen = Math.max(0,Math.min(whitchScreen,getChildCount()-1));
+
+        if(getScrollX() != (whitchScreen * getWidth())){
+            final int delta = whitchScreen * getWidth() - getScrollX();
+            mScroller.startScroll(getScrollX(),0,delta,0,Math.abs(delta)*1);//持续滚动时间  以毫秒为单位
+
+            mCurScreen = whitchScreen;
+            invalidate();
+
+            if(mOnViewChangeListener != null){
+                mOnViewChangeListener.OnViewChange(mCurScreen);
+            }
+        }
+    }
+
+    //切换到   目标  子布局  根据当前布局位置
+    private void snapToDestination() {
+        final int screenWidth = getWidth();
+        final int destScreen = (getScrollX() + screenWidth/2)/screenWidth;
+        snapToScreen(destScreen);
+    }
+
+    //事件 拦截
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev){
+        final int action = ev.getAction();
+        //当前正在  移动屏幕  状态已经被重置  进行事件拦截
+        if ((action == MotionEvent.ACTION_MOVE)&&(mTouchState!=TOUCH_STATE_REST)){
+            return true;
+        }
+        final float x = ev.getX();
+        final float y =ev.getY();
+        switch(action){
+            case MotionEvent.ACTION_MOVE:
+                final int xDiff = (int) Math.abs(mLastMotionX - x);
+                if (xDiff > mTouchSlop) {
+                    mTouchState = TOUCH_STATE_SCROLLING;
+                }
+                break;
+            case MotionEvent.ACTION_DOWN:
+                mLastMotionX = x;
+                mLastMotionY = y;
+
+                mTouchState =mScroller.isFinished() ? TOUCH_STATE_REST
+                        : TOUCH_STATE_SCROLLING;
+
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mTouchState = TOUCH_STATE_REST;
+                break;
+        }
+
+        return mTouchState != TOUCH_STATE_REST;
+    }
+    private static final int TOUCH_STATE_SCROLLING = 1;
+
+    private OnViewChangeListener mOnViewChangeListener;
+    //设置屏幕切换  监听器
+    public void SetOnViewChangeListener(OnViewChangeListener listner){
+        mOnViewChangeListener = listner;
+    }
+
+    /**
+     * 屏幕  切换监听器
+     */
+    public interface OnViewChangeListener{
+        public void OnViewChange(int view);
     }
 }

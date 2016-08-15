@@ -18,8 +18,6 @@
     <string name="frame_title_active_myself">我自己</string>
     <string name="frame_title_active_message">留言</string>
 
-
-
-
+    <string name="load_ing">加载中···</string>
 
 </resources>

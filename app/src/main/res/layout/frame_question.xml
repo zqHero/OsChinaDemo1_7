@@ -3,6 +3,7 @@
     android:orientation="vertical" 
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent">
+
 	<LinearLayout 
 		android:layout_width="fill_parent" 
 		android:layout_height="35.0dip"
@@ -34,8 +35,8 @@
          	android:text="@string/frame_title_question_site"/>
     </LinearLayout>
     
-	<net.oschina.app.widget.PullToRefreshListView
-	  	android:id="@+id/frame_listview_question"
-	    style="@style/widget_listview"/>
+	<!--<net.oschina.app.widget.PullToRefreshListView-->
+	  	<!--android:id="@+id/frame_listview_question"-->
+	    <!--style="@style/widget_listview"/>-->
 	
 </LinearLayout>

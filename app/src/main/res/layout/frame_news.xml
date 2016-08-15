@@ -24,13 +24,13 @@
          	android:text="@string/frame_title_news_recommend"/>
     </LinearLayout>
     
-	<!--<net.oschina.app.widget.PullToRefreshListView-->
-	  	<!--android:id="@+id/frame_listview_news"-->
-	    <!--style="@style/widget_listview"/>-->
+	<com.hero.zhaoq.oschinademo1_7.widget.PullToRefreshListView
+	  	android:id="@+id/frame_listview_news"
+	    style="@style/widget_listview"/>
 	
-	<!--<net.oschina.app.widget.PullToRefreshListView-->
-	  	<!--android:id="@+id/frame_listview_blog"-->
-	    <!--style="@style/widget_listview"-->
-	    <!--android:visibility="gone"/>-->
+	<com.hero.zhaoq.oschinademo1_7.widget.PullToRefreshListView
+	  	android:id="@+id/frame_listview_blog"
+	    style="@style/widget_listview"
+	    android:visibility="gone"/>
 	
 </LinearLayout>
