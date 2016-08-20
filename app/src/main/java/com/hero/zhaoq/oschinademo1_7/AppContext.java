@@ -12,6 +12,7 @@ public class AppContext extends Application{
 
     public final static String CONF_SCROLL = "perf_scroll";
 
+    public static final int PAGE_SIZE = 20; //默认分页大小
 //    /**
 //     * 是否左右滑动
 //     * @return

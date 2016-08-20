@@ -1,7 +1,10 @@
 package com.hero.zhaoq.oschinademo1_7.ui;
 
 import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -159,6 +162,8 @@ public class Main extends Activity {
 
     }
 
+
+    private List<News> lvNewsData = new ArrayList<News>();//传入的新闻   数据
     /**
      * 初始化 listView
      */
@@ -171,13 +176,12 @@ public class Main extends Activity {
 //        this.initTeeetListView();
 //        this.initActivityListView();
 //        this.initMsgListView();
-//        //加载数据
-//        this.initFrameListViewData();
 
+        //加载数据   加载所有    请求数据信息
+        this.initFrameListViewData();
     }
 
     private View lvNews_footer;//下拉刷新的布局
-    private List<News> lvNewsData = new ArrayList<News>();//传入的数据
 
     private TextView lvNews_foot_more;
     private ProgressBar lvNews_foot_progress;
@@ -191,6 +195,77 @@ public class Main extends Activity {
         lvNews.setAdapter(lvNewsAdapter);
         //添加 事件
 
+    }
+
+    private Handler lvNewsHandler;
+    /**
+     * 加载所有listView  的数据
+     */
+    private void initFrameListViewData() {
+        //
+        lvNewsHandler = getLvHandler(lvNews, lvNewsAdapter, lvNews_foot_more, lvNews_foot_progress, AppContext.PAGE_SIZE);
+    }
+
+    /**
+     * 获取  listView 的初始化   handler 用于初始化数据
+     */
+    private Handler getLvHandler(final PullToRefreshListView lv, final ListViewNewsAdapter adapter,
+                                 final TextView more,final ProgressBar progress,final int pageSize) {
+        return new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                if(msg.what>=0){
+                    //listView 数据处理：
+                    Notice notice = handleLvData(msg.what,msg.obj,msg.arg2,msg.arg1);
+                    if (msg.what < pageSize){
+                        lv.setTag(UIHelper.LISTVIEW_DATA_FULL);
+                        adapter.notifyDataSetChanged();
+                        more.setText(R.string.load_full);
+                    }else if(msg.what == pageSize){
+                        lv.setTag(UIHelper.LISTVIEW_DATA_MORE);
+                        adapter.notifyDataSetChanged();
+                        more.setText(R.string.load_more);
+
+                        //特殊处理-热门动弹不能翻页
+                        if(lv == lvTweet) {
+                            TweetList tlist = (TweetList)msg.obj;
+                            if(lvTweetData.size() == tlist.getTweetCount()){
+                                lv.setTag(UIHelper.LISTVIEW_DATA_FULL);
+                                more.setText(R.string.load_full);
+                            }
+                        }
+                    }
+                    if(notice !=null){//通知 不为null
+                        UIHelper.sendBroadCast(lv.getContext(), notice);
+                    }
+                    //是否清除通知信息
+                    if(isClearNotice){
+                        ClearNotice(CurClearNoticeType);
+                        isCLearNotice = false;//重置
+                        curClearNoticeType = 0;
+                    }
+                }
+                else if(msg.what == -1){
+                    //有异常  -- 显示加载出错  & 弹出错误消息
+                    lv.setTag(UIHelper.LISTVIEW_DATA_MORE);
+                    more.setText(R.string.load_error);
+                    ((AppException)msg.obj).makeToast(Main.this);
+                }
+                if(adapter.getCount() ==0){
+                    lv.setTag(UIHeler.LISTVIEW_DATA_EMPTY);
+                    more.setText(R.string.load_empty);
+                }
+                progress.setVisibility(ProgressBar.GONE);
+                mHeadProgress.setVisibility(ProgressBar.GONE);
+                if(msg.arg1 == UIHelper.LISTVIEW_ACTION_REFRESH){
+                    lv.onRefreshComplete(getString(R.string.pull_to_refresh_update) + new Date().toLocaleString());
+                    lv.setSelection(0);
+                }else if(msg.arg1 == UIHelper.LISTVIEW_ACTION_CHANGE_CATALOG){
+                    lv.onRefreshComplete();
+                    lv.setSelection(0);
+                }
+            }
+        };
     }
 
     @Override
