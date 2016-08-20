@@ -3,6 +3,9 @@ package com.hero.zhaoq.oschinademo1_7.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.AbsListView;
@@ -39,9 +42,6 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     private TextView lastUpdatedTextView;
     private ImageView arrowImageView;
     private ProgressBar progressBar;
-    //
-
-
 
     public PullToRefreshListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -97,12 +97,132 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView absListView, int i) {
+    public boolean onTouchEvent(MotionEvent ev) {
+        return super.onTouchEvent(ev);
+    }
 
+    //计算   headView 的宽和高
+    private void measureView(LinearLayout child) {
+        ViewGroup.LayoutParams p = child.getLayoutParams();
+        if(p==null){
+            p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        int childWidthSpec = ViewGroup.getChildMeasureSpec(0,0+0,p.width);
+        int lpHeight = p.height;
+        int childHeightSpec;
+        if(lpHeight > 0){ //设置测量模式
+            childHeightSpec = MeasureSpec.makeMeasureSpec(lpHeight,
+                    MeasureSpec.EXACTLY);
+        }else {
+            childHeightSpec = MeasureSpec.makeMeasureSpec(0,
+                    MeasureSpec.UNSPECIFIED);
+        }
+        child.measure(childWidthSpec,childHeightSpec);
+    }
+
+    private int state; //刷新完成
+    public void onRefreshComplete(){
+        state = DONE;
+        changeHeaderViewByState();
+    }
+
+    public OnRefreshListener refreshListener;
+    private void onRefresh(){
+        if (refreshListener != null) {
+            refreshListener.onRefresh();
+        }
+    }
+
+    private TextView tipsTextview;
+    private boolean isBack;
+    private int headContentOriginalTopPadding;
+    /**
+     * 完成  刷新后  改变状态   更新界面
+     */
+    private void changeHeaderViewByState() {
+        switch (state){
+            case RELEASE_To_REFRESH:
+
+                arrowImageView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                tipsTextView.setVisibility(View.VISIBLE);
+                lastUpdatedTextView.setVisibility(View.VISIBLE);
+
+                arrowImageView.clearAnimation();
+                arrowImageView.startAnimation(animation);
+
+                tipsTextview.setText(R.string.pull_to_refresh_release_label);
+
+                break;
+            case PULL_To_REFRESH:
+
+                progressBar.setVisibility(View.GONE);
+                tipsTextView.setVisibility(View.VISIBLE);
+                lastUpdatedTextView.setVisibility(View.VISIBLE);
+                arrowImageView.clearAnimation();
+                arrowImageView.setVisibility(View.VISIBLE);
+
+                if(isBack){
+                    isBack = false;
+                    arrowImageView.clearAnimation();
+                    arrowImageView.startAnimation(reverseAnimation);
+                }
+                tipsTextView.setText(R.string.pull_to_refresh_pull_label); //下拉可以刷新
+
+                break;
+            case REFRESGINH:
+                headView.setPadding(headView.getPaddingLeft(), headContentOriginalTopPadding,
+                        headView.getPaddingRight(), headView.getPaddingBottom());
+                headView.invalidate();
+
+                progressBar.setVisibility(View.VISIBLE);
+                arrowImageView.clearAnimation();
+                arrowImageView.setVisibility(View.GONE);
+                tipsTextView.setText(R.string.pull_to_refresh_refreshing_label);
+                lastUpdatedTextView.setVisibility(View.GONE);
+
+                break;
+            case DONE:
+
+                headView.setPadding(headView.getPaddingLeft(), -1 * headContentHeight,
+                        headView.getPaddingRight(), headView.getPaddingBottom());
+                headView.invalidate();
+
+                progressBar.setVisibility(View.GONE);
+                arrowImageView.clearAnimation();
+                //此处更换图标
+                arrowImageView.setImageResource(R.mipmap.ic_pulltorefresh_arrow);
+
+                tipsTextview.setText(R.string.pull_to_refresh_pull_label);
+                lastUpdatedTextView.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    //记录  当前状态 和索引值
+    private int currentScrollState;
+    private int firstItemIndex;
+
+    @Override
+    public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+        currentScrollState = scrollState;
     }
 
     @Override
-    public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+    public void onScroll(AbsListView absListView, int firstVisiableItem, int visibleItemCount, int totalItemCount) {
+        firstItemIndex = firstVisiableItem;
+    }
 
+    public OnRefreshListener getRefreshListener() {
+        return refreshListener;
+    }
+
+    public void setRefreshListener(OnRefreshListener refreshListener) {
+        this.refreshListener = refreshListener;
+    }
+
+    public interface OnRefreshListener {
+        public void onRefresh();
     }
 }
