@@ -96,9 +96,112 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
         setOnScrollListener(this);
     }
 
+
+    private boolean isRecored;
+    private int startY;
+    private int startX;
+
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return super.onTouchEvent(ev);
+    public boolean onTouchEvent(MotionEvent event) {
+
+        switch(event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                if(firstItemIndex == 0 && !isRecored){
+                    startY = (int) event.getY();
+                    isRecored = true;
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                if(state != REFRESGINH){
+                    if(state == DONE){
+                        //当前  抬起什么都不做
+                        System.out.println("当前-抬起-ACTION_UP：DONE什么都不做");
+                    }else if(state == PULL_To_REFRESH){
+                        //下拉刷新
+                        state = DONE;
+                        changeHeaderViewByState();
+                    }else if(state == RELEASE_To_REFRESH){
+                        //正在刷新
+                        state = REFRESGINH;
+                        changeHeaderViewByState();
+                        onRefresh();
+                    }
+                }
+                isRecored = false;
+                isBack = false;
+
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+
+                int tempY = (int) event.getY();
+                if(!isRecored && firstItemIndex ==0){
+                    isRecored = true;
+                    startY = tempY;
+                }
+                if(state!=REFRESGINH && isRecored){
+                    //可以松开刷新了
+                    if(state == RELEASE_To_REFRESH){
+                        //往上推  推到屏幕  足够掩盖head的程度   但还没有全部覆盖
+                        if((tempY - startY < headContentHeight+20)
+                                && (tempY - startY) > 0){
+                            state = PULL_To_REFRESH;
+                            changeHeaderViewByState();
+                        }
+                        //一下子  推到顶：
+                        else if(tempY - startY <=0){
+                            state = DONE;
+                            changeHeaderViewByState();
+                        }
+                        //往下拉   或者还没有  上推到  屏幕顶部掩盖head
+                        else{
+                            //不用   进行特别的操作  只要更新paddingTop的值就可以了
+                        }
+                    }
+                    //还没有到达  显示  松开刷新的时候  DONE或者是PULL_TO_REFRESH状态
+                    else if(state == PULL_To_REFRESH){
+                        //下拉  到可以进入 RELEASE_TO_REFRESH的状态
+                        if(tempY - startY >= headContentHeight+20 &&
+                                currentScrollState == SCROLL_STATE_TOUCH_SCROLL){
+                            state = RELEASE_To_REFRESH;
+                            isBack = true;
+                            changeHeaderViewByState();
+                            //System.out.println("当前-滑动-PULL_To_REFRESH--》RELEASE_To_REFRESH-由done或者下拉刷新状态转变到松开刷新");
+                        }
+                        // 上推到顶了
+                        else if (tempY - startY <= 0) {
+                            state = DONE;
+                            changeHeaderViewByState();
+                            //System.out.println("当前-滑动-PULL_To_REFRESH--》DONE-由Done或者下拉刷新状态转变到done状态");
+                        }
+                    }
+                    //done 状态下
+                    else if(state == DONE){
+                        if (tempY - startY > 0) {
+                            state = PULL_To_REFRESH;
+                            changeHeaderViewByState();
+                            //System.out.println("当前-滑动-DONE--》PULL_To_REFRESH-由done状态转变到下拉刷新状态");
+                        }
+                    }
+                    //更新 headView 的size
+                    if(state == PULL_To_REFRESH){
+                        int topPadding = (int)((-1 * headContentHeight + (tempY - startY)));
+                        headView.setPadding(headView.getPaddingLeft(), topPadding, headView.getPaddingRight(), headView.getPaddingBottom());
+                        headView.invalidate();
+                        //System.out.println("当前-下拉刷新PULL_To_REFRESH-TopPad："+topPadding);
+                    }
+                    //更新headView的paddingTop
+                    if(state == RELEASE_To_REFRESH){
+                        int topPadding = (int)((tempY - startY - headContentHeight));
+                        headView.setPadding(headView.getPaddingLeft(), topPadding, headView.getPaddingRight(), headView.getPaddingBottom());
+                        headView.invalidate();
+                        //System.out.println("当前-释放刷新RELEASE_To_REFRESH-TopPad："+topPadding);
+                    }
+                }
+                break;
+        }
+        return super.onTouchEvent(event);
     }
 
     //计算   headView 的宽和高
@@ -125,6 +228,11 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     public void onRefreshComplete(){
         state = DONE;
         changeHeaderViewByState();
+    }
+    //有参的
+    public void onRefreshComplete(String update) {
+        lastUpdatedTextView.setText(update);
+        onRefreshComplete();
     }
 
     public OnRefreshListener refreshListener;
@@ -203,6 +311,14 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     //记录  当前状态 和索引值
     private int currentScrollState;
     private int firstItemIndex;
+
+    //点击刷新
+    public void clickRefresh(){
+        setSelection(0);
+        state = REFRESGINH;
+        changeHeaderViewByState();
+        onRefresh();
+    }
 
     @Override
     public void onScrollStateChanged(AbsListView absListView, int scrollState) {

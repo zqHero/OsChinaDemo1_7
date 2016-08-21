@@ -5,6 +5,8 @@ import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -14,14 +16,19 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.hero.zhaoq.oschinademo1_7.AppContext;
+import com.hero.zhaoq.oschinademo1_7.AppException;
 import com.hero.zhaoq.oschinademo1_7.R;
 import com.hero.zhaoq.oschinademo1_7.adapter.ListViewNewsAdapter;
 import com.hero.zhaoq.oschinademo1_7.bean.News;
+import com.hero.zhaoq.oschinademo1_7.bean.NewsList;
+import com.hero.zhaoq.oschinademo1_7.bean.Notice;
+import com.hero.zhaoq.oschinademo1_7.bean.TweetList;
 import com.hero.zhaoq.oschinademo1_7.common.UIHelper;
 import com.hero.zhaoq.oschinademo1_7.widget.PullToRefreshListView;
 import com.hero.zhaoq.oschinademo1_7.widget.ScrollLayout;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,7 +54,6 @@ public class Main extends Activity {
 
     private AppContext appContext;//
 
-    private PullToRefreshListView lvNews; // 最新新闻
     private ListViewNewsAdapter lvNewsAdapter;//适配器
 
     @Override
@@ -163,7 +169,6 @@ public class Main extends Activity {
     }
 
 
-    private List<News> lvNewsData = new ArrayList<News>();//传入的新闻   数据
     /**
      * 初始化 listView
      */
@@ -206,6 +211,10 @@ public class Main extends Activity {
         lvNewsHandler = getLvHandler(lvNews, lvNewsAdapter, lvNews_foot_more, lvNews_foot_progress, AppContext.PAGE_SIZE);
     }
 
+    private PullToRefreshListView lvNews; //控件
+    private List<News> lvNewsData = new ArrayList<News>();  //请求新闻信息
+    private int lvNewsSumData; //
+
     /**
      * 获取  listView 的初始化   handler 用于初始化数据
      */
@@ -226,24 +235,24 @@ public class Main extends Activity {
                         adapter.notifyDataSetChanged();
                         more.setText(R.string.load_more);
 
-                        //特殊处理-热门动弹不能翻页
-                        if(lv == lvTweet) {
-                            TweetList tlist = (TweetList)msg.obj;
-                            if(lvTweetData.size() == tlist.getTweetCount()){
-                                lv.setTag(UIHelper.LISTVIEW_DATA_FULL);
-                                more.setText(R.string.load_full);
-                            }
-                        }
+//                        //特殊处理-热门动弹不能翻页
+//                        if(lv == lvTweet) {
+//                            TweetList tlist = (TweetList)msg.obj;
+//                            if(lvTweetData.size() == tlist.getTweetCount()){
+//                                lv.setTag(UIHelper.LISTVIEW_DATA_FULL);
+//                                more.setText(R.string.load_full);
+//                            }
+//                        }
                     }
-                    if(notice !=null){//通知 不为null
-                        UIHelper.sendBroadCast(lv.getContext(), notice);
-                    }
-                    //是否清除通知信息
-                    if(isClearNotice){
-                        ClearNotice(CurClearNoticeType);
-                        isCLearNotice = false;//重置
-                        curClearNoticeType = 0;
-                    }
+//                    if(notice !=null){//通知 不为null
+//                        UIHelper.sendBroadCast(lv.getContext(), notice);
+//                    }
+//                    //是否清除通知信息
+//                    if(isClearNotice){
+//                        ClearNotice(CurClearNoticeType);
+//                        isCLearNotice = false;//重置
+//                        curClearNoticeType = 0;
+//                    }
                 }
                 else if(msg.what == -1){
                     //有异常  -- 显示加载出错  & 弹出错误消息
@@ -252,7 +261,7 @@ public class Main extends Activity {
                     ((AppException)msg.obj).makeToast(Main.this);
                 }
                 if(adapter.getCount() ==0){
-                    lv.setTag(UIHeler.LISTVIEW_DATA_EMPTY);
+                    lv.setTag(UIHelper.LISTVIEW_DATA_EMPTY);
                     more.setText(R.string.load_empty);
                 }
                 progress.setVisibility(ProgressBar.GONE);
@@ -266,6 +275,78 @@ public class Main extends Activity {
                 }
             }
         };
+    }
+
+    /**
+     * list View 数据处理
+     * @param what 数量
+     * @param obj 数据
+     * @param objtype 操作类型
+     * @param actiontype  通知信息
+     * @return
+     */
+    private Notice handleLvData(int what, Object obj, int objtype, int actiontype) {
+        Notice notice = null; //返回信息 通知类
+        switch(actiontype){
+            case UIHelper.LISTVIEW_ACTION_INIT:
+            case UIHelper.LISTVIEW_ACTION_REFRESH:
+            case UIHelper.LISTVIEW_ACTION_CHANGE_CATALOG:
+                int newdata = 0;//新加载数据  只有刷新动作才会使用的到
+                switch(objtype){
+                    case UIHelper.LISTVIEW_DATATYPE_NEWS://请求 新闻信息
+                        NewsList nlist = (NewsList)obj;
+                        notice = nlist.getNotice();
+                        lvNewsSumData = what;  //
+                        if(actiontype == UIHelper.LISTVIEW_ACTION_REFRESH){
+                            if(lvNewsData.size() > 0){
+                                for(News news1 : nlist.getNewslist()){
+                                    boolean b = false;
+                                    for(News news2 : lvNewsData){
+                                        if(news1.getId() == news2.getId()){
+                                            b = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!b) newdata++;
+                                }
+                            }else{
+                                newdata = what;
+                            }
+                        }
+                        lvNewsData.clear();//先清除原有数据
+                        lvNewsData.addAll(nlist.getNewslist());
+                        Log.i("info","----------"+lvNewsData.toString()+"--------");
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_BLOG://请求博客信息
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_POST:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_TWEET:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_ACTIVE:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_MESSAGE:
+                        break;
+                }
+                break;
+            case UIHelper.LISTVIEW_ACTION_SCROLL:
+                switch(objtype){
+                    case UIHelper.LISTVIEW_DATATYPE_NEWS:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_BLOG:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_POST:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_TWEET:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_ACTIVE:
+                        break;
+                    case UIHelper.LISTVIEW_DATATYPE_MESSAGE:
+                        break;
+                }
+                break;
+        }
+        return notice;
     }
 
     @Override
@@ -284,4 +365,6 @@ public class Main extends Activity {
         }
 //        mScrollLayout.setIsScroll(false);//appContext.isScroll  设置  可以滑动
     }
+
+
 }

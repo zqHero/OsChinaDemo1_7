@@ -8,8 +8,9 @@ import java.util.List;
  * Author:zhaoQiang
  * Email:zhao_hero@163.com
  * Date:2016/8/15  22:55
+ * 咨询   实体类
  */
-public class News {
+public class News extends Entity{
 
     private String title;
     private String url;
