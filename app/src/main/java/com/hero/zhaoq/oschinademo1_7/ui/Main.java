@@ -203,12 +203,58 @@ public class Main extends Activity {
     }
 
     private Handler lvNewsHandler;
+
+    private int curNewsCatalog = NewsList.CATALOG_ALL; //获取 所有资讯信息
     /**
      * 加载所有listView  的数据
      */
     private void initFrameListViewData() {
-        //
+        //设置
         lvNewsHandler = getLvHandler(lvNews, lvNewsAdapter, lvNews_foot_more, lvNews_foot_progress, AppContext.PAGE_SIZE);
+
+
+        //加载  咨询数据
+        if(lvNewsData.isEmpty()){
+            loadLvNewsData(curNewsCatalog,0,lvNewsHandler,UIHelper.LISTVIEW_ACTION_INIT);
+        }
+    }
+
+    /**
+     * 加载  数据信息
+     * @param catalog  类别标识
+     * @param pageIndex 当前页数
+     * @param handler 处理器
+     * @param action  动作标识
+     */
+    private void loadLvNewsData(final int catalog,final int pageIndex,final Handler handler,
+                                final int action) {
+        mHeadProgress.setVisibility(ProgressBar.VISIBLE);
+        new Thread(){
+            public void run(){
+                Message msg = new Message();
+                boolean isRefresh = false;
+                //加载数据   初始化  和滚动都要刷新数据：
+                if(action == UIHelper.LISTVIEW_ACTION_REFRESH
+                        || action == UIHelper.LISTVIEW_ACTION_SCROLL){
+                    isRefresh = true;
+                }
+                try {
+                    //加载  数据信息
+                    //catalog: 1    pageIndex: 0     isRefresh:true
+                    NewsList list = appContext.getNewsList(catalog, pageIndex, isRefresh);
+                    msg.what = list.getPageSize();
+                    msg.obj = list;
+                } catch (AppException e) {
+                    e.printStackTrace();
+                    msg.what = -1;
+                    msg.obj = e;
+                }
+                msg.arg1 = action;
+                msg.arg2 = UIHelper.LISTVIEW_DATATYPE_NEWS;
+                if(curNewsCatalog == catalog)
+                    handler.sendMessage(msg);
+            }
+        }.start();
     }
 
     private PullToRefreshListView lvNews; //控件

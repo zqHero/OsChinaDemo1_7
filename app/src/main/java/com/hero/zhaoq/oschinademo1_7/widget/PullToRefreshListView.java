@@ -60,38 +60,42 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     private void init(Context context) {
         //Interpolator用于动画中的时间插值，其作用就是把0到1的浮点值变化映射到另一个浮点值变化。
         //设置滑动效果：
-        animation = new RotateAnimation(0,-180,RotateAnimation.RELATIVE_TO_SELF,0.5f,
-                RotateAnimation.RELATIVE_TO_SELF,0.5f);
-        animation.setInterpolator(new LinearInterpolator());  //设置  差值器
+        animation = new RotateAnimation(0, -180,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+        animation.setInterpolator(new LinearInterpolator());
         animation.setDuration(100);
         animation.setFillAfter(true);
 
-        reverseAnimation = new RotateAnimation(-180,0,
-                RotateAnimation.RELATIVE_TO_SELF,0.5f,
-                RotateAnimation.RELATIVE_TO_SELF,0.5f);
+        reverseAnimation = new RotateAnimation(-180, 0,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
         reverseAnimation.setInterpolator(new LinearInterpolator());
         reverseAnimation.setDuration(100);
         reverseAnimation.setFillAfter(true);
 
         inflater = LayoutInflater.from(context);
-        headView = (LinearLayout) inflater.inflate(R.layout.pull_to_refresh_head,null);
+        headView = (LinearLayout) inflater.inflate(R.layout.pull_to_refresh_head, null);
 
         arrowImageView = (ImageView) headView.findViewById(R.id.head_arrowImageView);
-        arrowImageView.setMinimumHeight(50);
         arrowImageView.setMinimumWidth(50);
+        arrowImageView.setMinimumHeight(50);
         progressBar = (ProgressBar) headView.findViewById(R.id.head_progressBar);
-        tipsTextView = (TextView) headView.findViewById(R.id.head_tipsTextView);
+        tipsTextview = (TextView) headView.findViewById(R.id.head_tipsTextView);
         lastUpdatedTextView = (TextView) headView.findViewById(R.id.head_lastUpdatedTextView);
 
-        measureView(headView);
-        headContentHeight =  headView.getMeasuredHeight();  //获得  测量的高度
-        headContentWidth = headView.getMeasuredWidth(); //获得  测量的宽度
+        headContentOriginalTopPadding = headView.getPaddingTop();
 
-        headView.setPadding(headView.getPaddingLeft(),-1 * headContentHeight,
-                headView.getPaddingRight(),headView.getPaddingBottom());
+        measureView(headView);
+        headContentHeight = headView.getMeasuredHeight();
+        headContentWidth = headView.getMeasuredWidth();
+
+        headView.setPadding(headView.getPaddingLeft(), -1 * headContentHeight, headView.getPaddingRight(), headView.getPaddingBottom());
         headView.invalidate();
 
-        //添加   进头视图中
+        //System.out.println("初始高度："+headContentHeight);
+        //System.out.println("初始TopPad："+headContentOriginalTopPadding);
+
         addHeaderView(headView);
         setOnScrollListener(this);
     }

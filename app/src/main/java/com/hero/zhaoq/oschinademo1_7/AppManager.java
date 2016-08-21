@@ -1,6 +1,8 @@
 package com.hero.zhaoq.oschinademo1_7;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 
 import java.util.Stack;
 
@@ -47,5 +49,38 @@ public class AppManager {
             activity.finish();
             activity = null;
         }
+    }
+
+    /**
+     * 获取当前Activity（堆栈中最后一个压入的）
+     */
+    public Activity currentActivity(){
+        Activity activity=activityStack.lastElement();
+        return activity;
+    }
+
+    /**
+     * 推出应用程序
+     * @param context
+     */
+    public void AppExit(Context context){
+
+        finishAllActivity();
+        ActivityManager activityManager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.restartPackage(context.getPackageName());
+        System.exit(0);
+    }
+
+    /**
+     * 全部出栈 销毁
+     */
+    private void finishAllActivity() {
+        for(int i=0, size = activityStack.size();i<size;i++){
+            if(null != activityStack.get(i)){
+                activityStack.get(i).finish();
+            }
+        }
+        activityStack.clear();
     }
 }
