@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.hero.zhaoq.oschinademo1_7.AppManager;
 import com.hero.zhaoq.oschinademo1_7.R;
@@ -107,4 +108,30 @@ public class UIHelper {
         });
         builder.show();
     }
+
+
+    /**
+     * 弹出Toast消息
+     * @param msg
+     */
+    public static void ToastMessage(Context cont,String msg)
+    {
+        Toast.makeText(cont, msg, Toast.LENGTH_SHORT).show();
+    }
+
+//    /**
+//     * 显示    登录页面    Dialog
+//     * @param activity
+//     */
+//    public static void showLoginDialog(Context context)
+//    {
+//        Intent intent = new Intent(context,LoginDialog.class);
+//        if(context instanceof Main)
+//            intent.putExtra("LOGINTYPE", LoginDialog.LOGIN_MAIN);
+//        else if(context instanceof Setting)
+//            intent.putExtra("LOGINTYPE", LoginDialog.LOGIN_SETTING);
+//        else
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
+//    }
 }

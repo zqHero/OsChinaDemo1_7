@@ -6,10 +6,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Message;
 
 import com.hero.zhaoq.oschinademo1_7.api.ApiClient;
 import com.hero.zhaoq.oschinademo1_7.bean.NewsList;
 import com.hero.zhaoq.oschinademo1_7.bean.Notice;
+import com.hero.zhaoq.oschinademo1_7.common.StringUtils;
+import com.hero.zhaoq.oschinademo1_7.common.UIHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +24,8 @@ import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Properties;
+import java.util.UUID;
 
 /**
  * Package_name:com.hero.zhaoq.oschinademo1_7
@@ -32,6 +38,19 @@ public class AppContext extends Application{
     public final static String CONF_SCROLL = "perf_scroll";
 
     public static final int PAGE_SIZE = 20; //默认分页大小
+
+    private boolean login = false;	//登录状态
+    private int loginUid = 0;	//登录用户的id
+
+    private Handler unLoginHandler = new Handler(){
+        public void handleMessage(Message msg) {
+            if(msg.what == 1){
+                //发送到  主线程    更改ui界面
+                UIHelper.ToastMessage(AppContext.this, getString(R.string.msg_login_error));
+//                UIHelper.showLoginDialog(AppContext.this);  //弹出  登录界面
+            }
+        }
+    };
 
 
     /**
@@ -46,7 +65,8 @@ public class AppContext extends Application{
         NewsList list = null;
         String key = "newslist_"+catalog+"_"+pageIndex+"_"+PAGE_SIZE;
         //网络 已经连接   并且缓存存在     或者 正刷新
-        if(isNetworkConnected() && (!isReadDataCache(key) || isRefresh)) {
+        //isNetworkConnected() &&
+        if((!isReadDataCache(key) || isRefresh)) {
             try{
                 //请求  数据
                 list = ApiClient.getNewsList(this, catalog, pageIndex, PAGE_SIZE);
@@ -191,8 +211,72 @@ public class AppContext extends Application{
         return info;
     }
 
+    //判断  是否包含 属性值
+    public boolean containsProperty(String key){
+        Properties props = getProperties();
+        return props.containsKey(key);
+    }
 
+    //获取  所有  属性信息
+    public Properties getProperties(){
+        return AppConfig.getAppConfig(this).get();
+    }
+
+    //获取配置文件 属性内容
     public String getProperty(String key){
         return AppConfig.getAppConfig(this).get(key);
     }
+    //设置配置文件 属性内容：
+    public void setProperty(String key,String value){
+        AppConfig.getAppConfig(this).set(key, value);
+    }
+
+
+
+    /**
+     * 获取App唯一标识
+     * @return
+     */
+    public String getAppId() {
+        String uniqueID = getProperty(AppConfig.CONF_APP_UNIQUEID);
+        if(StringUtils.isEmpty(uniqueID)){
+            uniqueID = UUID.randomUUID().toString(); //获取硬件 id
+            setProperty(AppConfig.CONF_APP_UNIQUEID, uniqueID); //设置  属性信息
+        }
+        return uniqueID;
+    }
+
+    /**
+     * 用户注销
+     */
+    public void Logout() {
+        ApiClient.cleanCookie();
+        this.cleanCookie();
+        this.login = false;
+        this.loginUid = 0;
+    }
+
+    /**
+     * 清除保存的缓存
+     */
+    public void cleanCookie()
+    {
+        removeProperty(AppConfig.CONF_COOKIE);
+    }
+
+    /**
+     * 移除  属性信息
+     * @param key
+     */
+    public void removeProperty(String...key){
+        AppConfig.getAppConfig(this).remove(key);
+    }
+
+    /**
+     * 未登录或修改密码后的处理
+     */
+    public Handler getUnLoginHandler() {
+        return this.unLoginHandler;
+    }
+
 }

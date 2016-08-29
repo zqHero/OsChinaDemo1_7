@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.hero.zhaoq.oschinademo1_7">
+    package="com.hero.zhaoq.oschinademo1_7"
+    >
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
 
     <application
         android:name=".AppContext"
@@ -16,11 +23,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".ui.Main" />
         <activity android:name=".ui.TweetPub" />
         <activity android:name=".ui.BaseActivity" />
         <activity android:name=".ui.QuestionPub" />
         <activity android:name=".ui.Search"></activity>
     </application>
+
+
+
 
 </manifest>

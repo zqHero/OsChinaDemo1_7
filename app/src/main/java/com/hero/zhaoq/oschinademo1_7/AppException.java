@@ -25,6 +25,9 @@ import java.util.Date;
  * Email:zhao_hero@163.com
  * Date:2016/8/21  16:45
  * 应用程序异常类：用于捕获异常和提示错误信息
+ * 如何处理异常  信息    将异常信息封装起来
+ *  uncaughtException(Thread t, Throwable e) ，在这个函数里面，
+ *  我们可以做一些处理。例如将异常信息保存到sdcard上的某个位置，或者提示用户异常出现等等一些操作。
  */
 public class AppException extends Exception implements Thread.UncaughtExceptionHandler {
 
@@ -152,6 +155,11 @@ public class AppException extends Exception implements Thread.UncaughtExceptionH
         return http(e);
     }
 
+    //http异常  返回 错误码
+    public static AppException http(int code) {
+        return new AppException(TYPE_HTTP_CODE, code, null);
+    }
+
     //http异常
     public static AppException http(Exception e) {
         return new AppException(TYPE_HTTP_ERROR, 0 ,e);
@@ -160,6 +168,11 @@ public class AppException extends Exception implements Thread.UncaughtExceptionH
     //socket异常
     public static AppException socket(Exception e) {
         return new AppException(TYPE_SOCKET, 0 ,e);
+    }
+
+    //XmlPullParserException 解析异常
+    public static AppException xml(Exception e) {
+        return new AppException(TYPE_XML, 0, e);
     }
 
     /**
