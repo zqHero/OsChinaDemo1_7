@@ -32,7 +32,6 @@ import java.util.Map;
  */
 public class ApiClient {
 
-
     /***
      * 获取咨询列表中  最新咨询
      * @param appContext
@@ -51,9 +50,9 @@ public class ApiClient {
         }}); // http://www.oschina.net/action/api/news_list?
 
         try{
-            Log.i("info","get获取到的信息:"+http_get(appContext, newUrl)+"-------");
-//            return NewsList.parse(http_get(appContext, newUrl));//get  请求方式
-            return null;
+            Log.i("info","get获取到的信息:"+http_get(appContext, newUrl).toString()+"-------");
+            return NewsList.parse(http_get(appContext, newUrl));//get  请求方式
+//            return null;
         }catch(Exception e){
             if(e instanceof AppException)
                 throw (AppException)e;
@@ -79,7 +78,6 @@ public class ApiClient {
         return url.toString().replace("?&", "?");
     }
 
-
     private final static int RETRY_TIME = 3;//重新尝试 次数  尝试访问三次  获取数据
 
     /**
@@ -102,6 +100,8 @@ public class ApiClient {
                 httpClient = getHttpClinet();
                 httpGet = getHttpGet(url, cookie, userAgent);
                 int statusCode = httpClient.executeMethod(httpGet);
+
+                Log.i("info",statusCode+"-------------");
 
                 if(statusCode != HttpStatus.SC_OK){ //未连接成功  200
                     throw AppException.http(statusCode); //抛出异常

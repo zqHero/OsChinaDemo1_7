@@ -19,4 +19,6 @@ public class URLs {
     public final static String NEWS_LIST = URL_API_HOST+"action/api/news_list";
 
 
+
+
 }

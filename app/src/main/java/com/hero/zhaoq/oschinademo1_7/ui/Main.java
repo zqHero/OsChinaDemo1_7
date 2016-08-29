@@ -242,6 +242,7 @@ public class Main extends Activity {
                     //加载  数据信息
                     //catalog: 1    pageIndex: 0     isRefresh:true
                     NewsList list = appContext.getNewsList(catalog, pageIndex, isRefresh);
+                    Log.i("list----------",list.toString());
                     msg.what = list.getPageSize();
                     msg.obj = list;
                 } catch (AppException e) {
@@ -395,6 +396,7 @@ public class Main extends Activity {
         return notice;
     }
 
+    //初始化数据
     @Override
     protected void onResume() {
         super.onResume();
@@ -409,8 +411,6 @@ public class Main extends Activity {
             fbTweet.setChecked(false);
             fbSetting.setChecked(false);
         }
-//        mScrollLayout.setIsScroll(false);//appContext.isScroll  设置  可以滑动
+        mScrollLayout.setIsScroll(false);//appContext.isScroll  设置  可以滑动
     }
-
-
 }

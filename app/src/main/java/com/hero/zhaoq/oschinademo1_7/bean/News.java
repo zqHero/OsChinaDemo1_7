@@ -1,6 +1,7 @@
 package com.hero.zhaoq.oschinademo1_7.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +25,12 @@ public class News extends Entity{
     private int favorite;
     private NewsType newType;
     private List<Relative> relatives;
+
+    //创建对象  创建  news时创建类型对象
+    public News(){
+        this.newType = new NewsType();
+        this.relatives = new ArrayList<Relative>();
+    }
 
     public class NewsType implements Serializable { //请求类型
         public int type;
@@ -129,5 +136,22 @@ public class News extends Entity{
 
     public void setSoftwareName(String softwareName) {
         this.softwareName = softwareName;
+    }
+    @Override
+    public String toString() {
+        return "News{" +
+                "title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", body='" + body + '\'' +
+                ", author='" + author + '\'' +
+                ", authorId=" + authorId +
+                ", commentCount=" + commentCount +
+                ", pubDate='" + pubDate + '\'' +
+                ", softwareLink='" + softwareLink + '\'' +
+                ", softwareName='" + softwareName + '\'' +
+                ", favorite=" + favorite +
+                ", newType=" + newType +
+                ", relatives=" + relatives +
+                '}';
     }
 }

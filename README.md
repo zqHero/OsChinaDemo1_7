@@ -8,3 +8,5 @@ OSChinaDemo：
 原项目开源库：https://github.com/oschina/android-app
 
 项目接口：
+
+    最新资讯页：http://www.oschina.net/action/api/news_list?&catalog=1&pageSize=20&pageIndex=0

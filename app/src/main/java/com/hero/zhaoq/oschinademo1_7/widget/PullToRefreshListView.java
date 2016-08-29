@@ -38,10 +38,11 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     private LayoutInflater inflater;
 
     private LinearLayout headView;
-    private TextView tipsTextView;
     private TextView lastUpdatedTextView;
     private ImageView arrowImageView;
     private ProgressBar progressBar;
+
+    private TextView tipsTextview;
 
     public PullToRefreshListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -82,6 +83,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
         arrowImageView.setMinimumHeight(50);
         progressBar = (ProgressBar) headView.findViewById(R.id.head_progressBar);
         tipsTextview = (TextView) headView.findViewById(R.id.head_tipsTextView);
+
         lastUpdatedTextView = (TextView) headView.findViewById(R.id.head_lastUpdatedTextView);
 
         headContentOriginalTopPadding = headView.getPaddingTop();
@@ -246,7 +248,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
         }
     }
 
-    private TextView tipsTextview;
+
     private boolean isBack;
     private int headContentOriginalTopPadding;
     /**
@@ -258,7 +260,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
 
                 arrowImageView.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
-                tipsTextView.setVisibility(View.VISIBLE);
+                tipsTextview.setVisibility(View.VISIBLE);
                 lastUpdatedTextView.setVisibility(View.VISIBLE);
 
                 arrowImageView.clearAnimation();
@@ -270,7 +272,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
             case PULL_To_REFRESH:
 
                 progressBar.setVisibility(View.GONE);
-                tipsTextView.setVisibility(View.VISIBLE);
+                tipsTextview.setVisibility(View.VISIBLE);
                 lastUpdatedTextView.setVisibility(View.VISIBLE);
                 arrowImageView.clearAnimation();
                 arrowImageView.setVisibility(View.VISIBLE);
@@ -280,7 +282,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
                     arrowImageView.clearAnimation();
                     arrowImageView.startAnimation(reverseAnimation);
                 }
-                tipsTextView.setText(R.string.pull_to_refresh_pull_label); //下拉可以刷新
+                tipsTextview.setText(R.string.pull_to_refresh_pull_label); //下拉可以刷新
 
                 break;
             case REFRESGINH:
@@ -291,7 +293,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
                 progressBar.setVisibility(View.VISIBLE);
                 arrowImageView.clearAnimation();
                 arrowImageView.setVisibility(View.GONE);
-                tipsTextView.setText(R.string.pull_to_refresh_refreshing_label);
+                tipsTextview.setText(R.string.pull_to_refresh_refreshing_label);
                 lastUpdatedTextView.setVisibility(View.GONE);
 
                 break;
