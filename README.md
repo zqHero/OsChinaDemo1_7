@@ -18,3 +18,5 @@ userAgent:OSChina.NET/1.7.4_18/Android/5.1/sdk_phone_armv7/29b23c95-684a-4aea-99
     最新资讯页：http://www.oschina.net/action/api/news_list?&catalog=1&pageSize=20&pageIndex=0
 
     最新博客页：http://www.oschina.net/action/api/blog_list?&type=latest&pageSize=20&pageIndex=0
+
+    推荐阅读页：http://www.oschina.net/action/api/blog_list?&type=recommend&pageSize=20&pageIndex=0
