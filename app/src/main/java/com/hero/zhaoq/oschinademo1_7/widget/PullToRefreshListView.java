@@ -252,7 +252,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     private boolean isBack;
     private int headContentOriginalTopPadding;
     /**
-     * 完成  刷新后  改变状态   更新界面
+     * 完成  刷新后   改变状态    更新界面
      */
     private void changeHeaderViewByState() {
         switch (state){

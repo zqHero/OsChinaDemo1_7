@@ -170,6 +170,20 @@ public class AppException extends Exception implements Thread.UncaughtExceptionH
         return new AppException(TYPE_SOCKET, 0 ,e);
     }
 
+    public static AppException io(Exception e) {
+        if(e instanceof UnknownHostException || e instanceof ConnectException){
+            return new AppException(TYPE_NETWORK, 0, e);
+        }
+        else if(e instanceof IOException){
+            return new AppException(TYPE_IO, 0 ,e);
+        }
+        return run(e);
+    }
+
+    public static AppException run(Exception e) {
+        return new AppException(TYPE_RUN, 0, e);
+    }
+
     //XmlPullParserException 解析异常
     public static AppException xml(Exception e) {
         return new AppException(TYPE_XML, 0, e);
@@ -216,6 +230,14 @@ public class AppException extends Exception implements Thread.UncaughtExceptionH
             if(pw != null){ pw.close(); }
             if(fw != null){ try { fw.close(); } catch (IOException e) { }}
         }
+    }
+
+    /**
+     * 获取APP异常崩溃处理对象
+     * @return
+     */
+    public static AppException getAppExceptionHandler(){
+        return new AppException();
     }
 
     /**

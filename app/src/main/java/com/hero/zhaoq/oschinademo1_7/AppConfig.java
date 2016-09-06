@@ -61,7 +61,10 @@ public class AppConfig {
         FileInputStream fis = null;
         Properties props = new Properties();
         try {
-            //打开配置  文件
+            //读取files目录下的config
+            //fis = activity.openFileInput(APP_CONFIG);
+
+            //读取app_config目录下的config
             File dirConf = mContext.getDir(APP_CONFIG,Context.MODE_PRIVATE);
             fis = new FileInputStream(dirConf.getPath() + File.separator + APP_CONFIG);
 

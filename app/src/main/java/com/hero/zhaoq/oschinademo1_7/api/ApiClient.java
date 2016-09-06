@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.hero.zhaoq.oschinademo1_7.AppContext;
 import com.hero.zhaoq.oschinademo1_7.AppException;
+import com.hero.zhaoq.oschinademo1_7.bean.BlogList;
 import com.hero.zhaoq.oschinademo1_7.bean.NewsList;
 import com.hero.zhaoq.oschinademo1_7.bean.Result;
 import com.hero.zhaoq.oschinademo1_7.bean.URLs;
@@ -32,33 +33,6 @@ import java.util.Map;
  */
 public class ApiClient {
 
-    /***
-     * 获取咨询列表中  最新咨询
-     * @param appContext
-     * @param catalog
-     * @param pageIndex
-     * @param pageSize
-     * @return
-     */
-    public static NewsList getNewsList(AppContext appContext,final int catalog,
-                                       final  int pageIndex,final int pageSize) throws AppException {
-        //拼接参数数据
-        String newUrl = _MakeURL(URLs.NEWS_LIST, new HashMap<String, Object>(){{
-            put("catalog", catalog);
-            put("pageIndex", pageIndex);
-            put("pageSize", pageSize);
-        }}); // http://www.oschina.net/action/api/news_list?
-
-        try{
-            Log.i("info","get获取到的信息:"+http_get(appContext, newUrl).toString()+"-------");
-            return NewsList.parse(http_get(appContext, newUrl));//get  请求方式
-//            return null;
-        }catch(Exception e){
-            if(e instanceof AppException)
-                throw (AppException)e;
-            throw AppException.network(e);
-        }
-    }
 
     private static String _MakeURL(String p_url, Map<String, Object> params) {
         StringBuilder url = new StringBuilder(p_url);
@@ -226,5 +200,57 @@ public class ApiClient {
 
     public static void cleanCookie() {
         appCookie = "";
+    }
+
+
+    /***
+     * 获取咨询列表中  最新咨询
+     * @param appContext
+     * @param catalog
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    public static NewsList getNewsList(AppContext appContext,final int catalog,
+                                       final  int pageIndex,final int pageSize) throws AppException {
+        //拼接参数数据
+        String newUrl = _MakeURL(URLs.NEWS_LIST, new HashMap<String, Object>(){{
+            put("catalog", catalog);
+            put("pageIndex", pageIndex);
+            put("pageSize", pageSize);
+        }}); // http://www.oschina.net/action/api/news_list?
+
+        try{
+            Log.i("info","get获取到的信息:"+http_get(appContext, newUrl).toString()+"-------");
+            return NewsList.parse(http_get(appContext, newUrl));//get  请求方式
+//            return null;
+        }catch(Exception e){
+            if(e instanceof AppException)
+                throw (AppException)e;
+            throw AppException.network(e);
+        }
+    }
+
+    /**
+     * 获取   最新博客信息
+     * @param appContext
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    public static BlogList getBlogList(AppContext appContext, final String type, final int pageIndex, final int pageSize) throws AppException  {
+        String newUrl = _MakeURL(URLs.BLOG_LIST, new HashMap<String, Object>(){{
+            put("type", type);
+            put("pageIndex", pageIndex);
+            put("pageSize", pageSize);
+        }});
+
+        try{
+            return BlogList.parse(http_get(appContext, newUrl));
+        }catch(Exception e){
+            if(e instanceof AppException)
+                throw (AppException)e;
+            throw AppException.network(e);
+        }
     }
 }

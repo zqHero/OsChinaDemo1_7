@@ -19,7 +19,7 @@ import android.widget.Scroller;
 public class ScrollLayout extends ViewGroup{
 
     public ScrollLayout(Context context, AttributeSet attrs) {
-        //调用   本地后遭方法   用于  xml文件中创建布局
+        //调用   本地方法   用于  xml文件中创建布局
         this(context, attrs,0);
     }
 

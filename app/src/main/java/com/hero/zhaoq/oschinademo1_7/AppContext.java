@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.hero.zhaoq.oschinademo1_7.api.ApiClient;
+import com.hero.zhaoq.oschinademo1_7.bean.BlogList;
 import com.hero.zhaoq.oschinademo1_7.bean.NewsList;
 import com.hero.zhaoq.oschinademo1_7.bean.Notice;
 import com.hero.zhaoq.oschinademo1_7.common.StringUtils;
@@ -53,44 +54,7 @@ public class AppContext extends Application{
     };
 
 
-    /**
-     * 加载   资讯列表的信息
-     * @param catalog
-     * @param pageIndex
-     * @param isRefresh
-     * @return
-     * url:http://www.oschina.net/action/api/news_list?&catalog=1&pageSize=20&pageIndex=2
-     */
-    public NewsList getNewsList(int catalog, int pageIndex, boolean isRefresh)throws AppException {
-        NewsList list = null;
-        String key = "newslist_"+catalog+"_"+pageIndex+"_"+PAGE_SIZE;
-        //网络 已经连接   并且缓存存在     或者 正刷新
-        //isNetworkConnected() &&
-        if((!isReadDataCache(key) || isRefresh)) {
-            try{
-                //请求  数据
-                list = ApiClient.getNewsList(this, catalog, pageIndex, PAGE_SIZE);
-                if(list != null && pageIndex == 0){
-                    Notice notice = list.getNotice();
-                    list.setNotice(null);
-                    list.setCacheKey(key);
-                    //写进  缓存
-                    saveObject(list, key);
-                    list.setNotice(notice);
-                }
-            }catch(Exception e){
-                list = (NewsList)readObject(key);
-                if(list == null)
-                    throw e;
-            }
-        } else {
-            //读取   缓存信息
-            list = (NewsList)readObject(key);
-            if(list == null)
-                list = new NewsList();
-        }
-        return list;
-    }
+
 
     /**
      * 保存对象
@@ -231,8 +195,6 @@ public class AppContext extends Application{
         AppConfig.getAppConfig(this).set(key, value);
     }
 
-
-
     /**
      * 获取App唯一标识
      * @return
@@ -279,4 +241,79 @@ public class AppContext extends Application{
         return this.unLoginHandler;
     }
 
+    /**
+     * 加载   资讯列表的信息
+     * @param catalog
+     * @param pageIndex
+     * @param isRefresh
+     * @return
+     * url:http://www.oschina.net/action/api/news_list?&catalog=1&pageSize=20&pageIndex=2
+     */
+    public NewsList getNewsList(int catalog, int pageIndex, boolean isRefresh)throws AppException {
+        NewsList list = null;
+        String key = "newslist_"+catalog+"_"+pageIndex+"_"+PAGE_SIZE;
+        //网络 已经连接   并且缓存存在     或者 正刷新
+        //isNetworkConnected() &&
+        if((!isReadDataCache(key) || isRefresh)) {
+            try{
+                //请求  数据
+                list = ApiClient.getNewsList(this, catalog, pageIndex, PAGE_SIZE);
+                if(list != null && pageIndex == 0){
+                    Notice notice = list.getNotice();
+                    list.setNotice(null);
+                    list.setCacheKey(key);
+                    //写进  缓存
+                    saveObject(list, key);
+                    list.setNotice(notice);
+                }
+            }catch(Exception e){
+                list = (NewsList)readObject(key);
+                if(list == null)
+                    throw e;
+            }
+        } else {
+            //读取   缓存信息
+            list = (NewsList)readObject(key);
+            if(list == null)
+                list = new NewsList();
+        }
+        return list;
+    }
+
+    /**
+     * 获取  最新 博客信息
+     * @param type
+     * @param pageIndex
+     * @param isRefresh
+     * @return
+     */
+    public BlogList getBlogList(String type, int pageIndex, boolean isRefresh) {
+        BlogList list = null;
+        String key = "bloglist_"+type+"_"+pageIndex+"_"+PAGE_SIZE;
+
+        //判断  网络连接
+        if(isNetworkConnected() && (!isReadDataCache(key) || isRefresh)) {//  网络已连接  并且 读取缓存数据不为null  可以刷新
+            try{
+                //请求
+                list = ApiClient.getBlogList(this, type, pageIndex, PAGE_SIZE);
+
+                if(list != null && pageIndex == 0){
+                    Notice notice = list.getNotice();
+                    list.setNotice(null);
+                    list.setCacheKey(key);
+                    saveObject(list, key);  //缓存对象
+                    list.setNotice(notice);
+                }
+            }catch(AppException e){
+                list = (BlogList)readObject(key);
+                if(list == null)
+                ;
+            }
+        } else {
+            list = (BlogList)readObject(key);
+            if(list == null)
+                list = new BlogList();
+        }
+        return list;
+    }
 }
