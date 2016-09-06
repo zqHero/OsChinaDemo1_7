@@ -24,6 +24,8 @@
     <string name="pull_to_refresh_tap_label">下拉可以刷新</string>
     <string name="pull_to_refresh_update">最近更新：</string>
 
+    <string name="news_detail_lable_pub">发布于</string>
+    <string name="news_detail_head_title">新闻正文</string>
 
 
 </resources>

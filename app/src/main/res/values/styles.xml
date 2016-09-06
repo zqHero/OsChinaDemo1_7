@@ -81,5 +81,50 @@
         <!--<item name="android:clickable">true</item>-->
     <!--</style>-->
 
+    <!--新闻资讯  详情页  样式-->
+    <style name="detail_head_title">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20dip</item>
+        <item name="android:textColor">@color/head_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:shadowColor">#ffffffff</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+    </style>
+
+    <style name="detail_cut_line">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">2.0dip</item>
+        <item name="android:layout_marginTop">8.0dip</item>
+        <item name="android:layout_marginBottom">10.0dip</item>
+        <item name="android:layout_marginLeft">6.0dip</item>
+        <item name="android:layout_marginRight">6.0dip</item>
+        <item name="android:background">@mipmap/line_bluegray</item>
+    </style>
+
+
+    <style name="user_face_image">
+        <item name="android:layout_width">40.0dip</item>
+        <item name="android:layout_height">40.0dip</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:padding">1.0dip</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">@drawable/widget_dface_border</item>
+        <item name="android:src">@mipmap/widget_dface_loading</item>
+    </style>
+
+    <style name="main_footbar_image">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/widget_bar_bg</item>
+        <item name="android:clickable">true</item>
+    </style>
+
 
 </resources>

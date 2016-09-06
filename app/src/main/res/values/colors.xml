@@ -7,9 +7,12 @@
 
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+    <color name="gray">#808080</color>
 
 
     <color name="head_text">#0e5986</color>
+
+    <color name="author_text">#0e5986</color>
 
 
     <color name="frame_button_text_nor">#033a5c</color>

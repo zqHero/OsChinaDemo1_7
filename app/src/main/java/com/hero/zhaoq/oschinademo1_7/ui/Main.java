@@ -192,6 +192,18 @@ public class Main extends Activity {
         framebtn_News_blog.setOnClickListener(frameNewsBtnClick(framebtn_News_blog,BlogList.CATALOG_LATEST));
         framebtn_News_recommend.setOnClickListener(frameNewsBtnClick(framebtn_News_recommend,BlogList.CATALOG_RECOMMEND));
 
+//        //问答
+//        framebtn_Question_ask.setOnClickListener(frameQuestionBtnClick(framebtn_Question_ask,PostList.CATALOG_ASK));
+//        framebtn_Question_share.setOnClickListener(frameQuestionBtnClick(framebtn_Question_share,PostList.CATALOG_SHARE));
+//        framebtn_Question_other.setOnClickListener(frameQuestionBtnClick(framebtn_Question_other,PostList.CATALOG_OTHER));
+//        framebtn_Question_job.setOnClickListener(frameQuestionBtnClick(framebtn_Question_job,PostList.CATALOG_JOB));
+//        framebtn_Question_site.setOnClickListener(frameQuestionBtnClick(framebtn_Question_site,PostList.CATALOG_SITE));
+//
+//        //动弹
+//        framebtn_Tweet_lastest.setOnClickListener(frameTweetBtnClick(framebtn_Tweet_lastest,TweetList.CATALOG_LASTEST));
+//        framebtn_Tweet_hot.setOnClickListener(frameTweetBtnClick(framebtn_Tweet_hot,TweetList.CATALOG_HOT));
+
+
     }
 
     /**
@@ -352,7 +364,25 @@ public class Main extends Activity {
         lvNews.addFooterView(lvNews_footer);//添加底部视图  必须在setAdapter前
         lvNews.setAdapter(lvNewsAdapter);
         //添加  item 事件
+        lvNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //点击头部、底部栏无效
+                if(position == 0 || view == lvNews_footer) return;
 
+                News news = null;
+                //判断是否是TextView
+                if(view instanceof TextView){
+                    news = (News)view.getTag();
+                }else{
+                    TextView tv = (TextView)view.findViewById(R.id.news_listitem_title);
+                    news = (News)tv.getTag();
+                }
+                if(news == null) return;
+
+                //跳转到新闻详情  页   显示新闻详情
+                UIHelper.showNewsRedirect(view.getContext(), news);
+            }
+        });
     }
 
     /**
@@ -392,7 +422,6 @@ public class Main extends Activity {
         });
     }
 
-
     /**
      * 加载  最新  资讯  数据信息
      * @param catalog  类别标识
@@ -431,7 +460,6 @@ public class Main extends Activity {
             }
         }.start();
     }
-
     /**
      * 加载 最新博客界面的数据
      */
@@ -469,8 +497,6 @@ public class Main extends Activity {
             }
         }.start();
     }
-
-
 
     /**
      * 获取  listView 的初始化   handler 用于初始化数据
@@ -669,6 +695,7 @@ public class Main extends Activity {
             }
         };
     }
+
     //初始化  问题界面的    点击事件  初始化
     public View.OnClickListener frameQuestionBtnClick(final Button btn, final int catalog){
         return new View.OnClickListener() {
@@ -696,6 +723,29 @@ public class Main extends Activity {
 
 //                curQuestionCatalog = catalog;
 //                loadLvQuestionData(curQuestionCatalog, 0, lvQuestionHandler, UIHelper.LISTVIEW_ACTION_CHANGE_CATALOG);
+            }
+        };
+    }
+
+    //初始化  动弹界面的    点击事件  初始化
+    private View.OnClickListener frameTweetBtnClick(final Button btn,final int catalog){
+        return new View.OnClickListener() {
+            public void onClick(View v) {
+                if(btn == framebtn_Tweet_lastest)
+                    framebtn_Tweet_lastest.setEnabled(false);
+                else
+                    framebtn_Tweet_lastest.setEnabled(true);
+                if(btn == framebtn_Tweet_hot)
+                    framebtn_Tweet_hot.setEnabled(false);
+                else
+                    framebtn_Tweet_hot.setEnabled(true);
+                if(btn == framebtn_Tweet_my)
+                    framebtn_Tweet_my.setEnabled(false);
+                else
+                    framebtn_Tweet_my.setEnabled(true);
+
+//                curTweetCatalog = catalog;
+//                loadLvTweetData(curTweetCatalog, 0, lvTweetHandler, UIHelper.LISTVIEW_ACTION_CHANGE_CATALOG);
             }
         };
     }
