@@ -8,9 +8,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.hero.zhaoq.oschinademo1_7.api.ApiClient;
 import com.hero.zhaoq.oschinademo1_7.bean.BlogList;
+import com.hero.zhaoq.oschinademo1_7.bean.CommentList;
+import com.hero.zhaoq.oschinademo1_7.bean.News;
 import com.hero.zhaoq.oschinademo1_7.bean.NewsList;
 import com.hero.zhaoq.oschinademo1_7.bean.Notice;
 import com.hero.zhaoq.oschinademo1_7.common.StringUtils;
@@ -36,6 +39,11 @@ import java.util.UUID;
  */
 public class AppContext extends Application{
 
+    public static final int NETTYPE_WIFI = 0x01; //网络连接  标识 wifi
+    public static final int NETTYPE_CMWAP = 0x02;//CMWAP 和 CMNET 只是中国移动人为划分的两个GPRS接入方式。前者是为手机WAP上网而设立的，
+    public static final int NETTYPE_CMNET = 0x03;// 后者则主要是为PC、笔记本电脑、PDA等利用GPRS上网服务
+
+
     public final static String CONF_SCROLL = "perf_scroll";
 
     public static final int PAGE_SIZE = 20; //默认分页大小
@@ -53,7 +61,32 @@ public class AppContext extends Application{
         }
     };
 
-
+    /**
+     * 获取当前网络类型
+     * @return 0：没有网络   1：WIFI网络   2：WAP网络    3：NET网络
+     */
+    public int getNetworkType() {
+        int netType = 0;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null) {
+            return netType;
+        }
+        int nType = networkInfo.getType();
+        if (nType == ConnectivityManager.TYPE_MOBILE) {
+            String extraInfo = networkInfo.getExtraInfo();
+            if(!StringUtils.isEmpty(extraInfo)){
+                if (extraInfo.toLowerCase().equals("cmnet")) {
+                    netType = NETTYPE_CMNET;
+                } else {
+                    netType = NETTYPE_CMWAP;
+                }
+            }
+        } else if (nType == ConnectivityManager.TYPE_WIFI) {
+            netType = NETTYPE_WIFI;
+        }
+        return netType;
+    }
 
 
     /**
@@ -242,6 +275,20 @@ public class AppContext extends Application{
     }
 
     /**
+     * 是否加载显示文章图片
+     * @return
+     */
+    public boolean isLoadImage()
+    {
+        String perf_loadimage = getProperty("perf_loadimage");
+        //默认是加载的
+        if(StringUtils.isEmpty(perf_loadimage))
+            return true;
+        else
+            return StringUtils.toBool(perf_loadimage);
+    }
+
+    /**
      * 加载   资讯列表的信息
      * @param catalog
      * @param pageIndex
@@ -315,5 +362,75 @@ public class AppContext extends Application{
                 list = new BlogList();
         }
         return list;
+    }
+
+    /**
+     * 评论列表
+     * @param catalog 1新闻 2帖子 3动弹 4动态
+     * @param id 某条新闻，帖子，动弹的id 或者某条留言的friendid
+     * @param pageIndex
+     * @return
+     * @throws AppException
+     */
+    public CommentList getCommentList(int catalog, int id, int pageIndex, boolean isRefresh) throws AppException {
+        CommentList list = null;
+        String key = "commentlist_"+catalog+"_"+id+"_"+pageIndex+"_"+PAGE_SIZE;
+        if(isNetworkConnected() && (!isReadDataCache(key) || isRefresh)) {
+            try{
+                //获取 评论列表
+                list = ApiClient.getCommentList(this, catalog, id, pageIndex, PAGE_SIZE);
+                if(list != null && pageIndex == 0){
+                    Notice notice = list.getNotice();
+                    list.setNotice(null);
+                    list.setCacheKey(key);
+                    saveObject(list, key);
+                    list.setNotice(notice);
+                }
+            }catch(AppException e){
+                list = (CommentList)readObject(key);
+                if(list == null)
+                    throw e;
+            }
+        } else {
+            list = (CommentList)readObject(key);
+            if(list == null)
+                list = new CommentList();
+        }
+        return list;
+    }
+
+    /**
+     * 新闻  详情
+     * @param news_id
+     * @return
+     * http://www.oschina.net/action/api/news_list?&catalog=1&pageSize=20&pageIndex=2
+     */
+    public News getNews(int news_id, boolean isRefresh) throws AppException {
+        News news = null;
+        String key = "news_"+news_id;
+        if(isNetworkConnected() && (!isReadDataCache(key) || isRefresh)) {
+            try{
+                Log.i("info","++++++++++++++++++++++++++++");
+                //获取  资讯  详情
+                news = ApiClient.getNewsDetail(this, news_id);
+                Log.i("info","----"+news.toString());
+                if(news != null){
+                    Notice notice = news.getNotice();
+                    news.setNotice(null);
+                    news.setCacheKey(key);
+                    saveObject(news, key);
+                    news.setNotice(notice);
+                }
+            }catch(AppException e){
+                news = (News)readObject(key);
+                if(news == null)
+                    throw e;
+            }
+        } else {
+            news = (News)readObject(key);
+            if(news == null)
+                news = new News();
+        }
+        return news;
     }
 }

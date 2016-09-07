@@ -25,6 +25,7 @@
     <string name="submit_report">提交报告</string>
 
     <string name="msg_login_error">用户未登录 或 密码错误</string>
+    <string name="msg_load_is_null">读取失败，可能已被删除</string>
 
 
 </resources>

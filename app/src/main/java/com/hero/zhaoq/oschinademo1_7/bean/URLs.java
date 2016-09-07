@@ -57,11 +57,15 @@ public class URLs {
     private final static String URL_SPLITTER = "/";
 
     private final static String URL_API_HOST = HTTP + HOST + URL_SPLITTER; //  http://www.oschina.net/
-    public final static String NEWS_LIST = URL_API_HOST+"action/api/news_list";
 
-    public final static String BLOG_LIST = URL_API_HOST+"action/api/blog_list";
+    public final static String NEWS_LIST = URL_API_HOST+"action/api/news_list"; //获取  资讯列表
+    public final static String NEWS_DETAIL = URL_API_HOST+"action/api/news_detail"; //获取  资讯详情
+
+    public final static String BLOG_LIST = URL_API_HOST+"action/api/blog_list";//博客列表
 
     private final static String URL_TYPE_NEWS = URL_WWW_HOST + URL_SPLITTER + "news" + URL_SPLITTER;
+
+    public final static String COMMENT_LIST = URL_API_HOST+"action/api/comment_list"; //获取评论列表
 
 
     /**

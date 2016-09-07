@@ -28,6 +28,7 @@ public class AppConfig {
     public final static String CONF_COOKIE = "cookie";
     public final static String CONF_APP_UNIQUEID = "APP_UNIQUEID"; //app唯一标示
 
+    public final static String TEMP_COMMENT = "temp_comment";//推荐  阅读标识
 
     //获取 配置信息类
     public static AppConfig getAppConfig(Context context)

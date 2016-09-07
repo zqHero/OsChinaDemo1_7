@@ -28,7 +28,8 @@
         <activity android:name=".ui.BaseActivity" />
         <activity android:name=".ui.QuestionPub" />
         <activity android:name=".ui.Search" />
-        <activity android:name=".ui.NewsDetail"></activity>
+        <activity android:name=".ui.NewsDetail" />
+        <activity android:name=".bean.UserCenter"></activity>
     </application>
 
 </manifest>

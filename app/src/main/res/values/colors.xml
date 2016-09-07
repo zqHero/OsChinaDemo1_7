@@ -8,6 +8,7 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="gray">#808080</color>
+    <color name="lemonyellow">#FFFACD</color>
 
 
     <color name="head_text">#0e5986</color>
@@ -17,8 +18,14 @@
 
     <color name="frame_button_text_nor">#033a5c</color>
     <color name="frame_button_text_select">#FFFFFF</color>
+
     <color name="listitem_gray">#ff9da19e</color>
     <color name="listitem_transparent">#00000000</color>
     <color name="listitem_black">#ff000000</color>
+    <color name="listitem_white">#ffffffff</color>
+    <color name="listitem_blue">#0e5986</color>
+    <color name="listitem_green">#ffe3ffc6</color>
+    <color name="listitem_greenyellow">#ff87b869</color>
+    <color name="listitem_yellow">#fffaffbf</color>
 
 </resources>

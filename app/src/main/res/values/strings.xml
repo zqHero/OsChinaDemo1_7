@@ -27,5 +27,7 @@
     <string name="news_detail_lable_pub">发布于</string>
     <string name="news_detail_head_title">新闻正文</string>
 
+    <string name="comment_reply_title">---共有 %d 条评论---</string>
+
 
 </resources>

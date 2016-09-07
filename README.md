@@ -19,4 +19,7 @@ userAgent:OSChina.NET/1.7.4_18/Android/5.1/sdk_phone_armv7/29b23c95-684a-4aea-99
 
     最新博客页：http://www.oschina.net/action/api/blog_list?&type=latest&pageSize=20&pageIndex=0
 
-    推荐阅读页：http://www.oschina.net/action/api/blog_list?&type=recommend&pageSize=20&pageIndex=0
+    推荐阅读页：http://www.oschina.net/action/api/blog_list?&type=recom1mend&pageSize=20&pageIndex=0
+
+
+    评论列表数据：http://www.oschina.net/action/api/comment_list?&id=76853&catalog=1&pageSize=20&pageIndex=0

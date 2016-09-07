@@ -68,7 +68,7 @@
 		        android:autoLink="web|email"
 		        android:gravity="top"
 		        android:background="@mipmap/reply_edittext_bg"
-		        android:visibility="gone"/>			
+		        android:visibility="gone"/>
 		   	<Button 
 		   		android:id="@+id/news_detail_foot_pubcomment"
 			   	android:layout_width="45dip" 

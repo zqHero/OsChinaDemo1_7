@@ -1,10 +1,14 @@
 package com.hero.zhaoq.oschinademo1_7.api;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.hero.zhaoq.oschinademo1_7.AppContext;
 import com.hero.zhaoq.oschinademo1_7.AppException;
 import com.hero.zhaoq.oschinademo1_7.bean.BlogList;
+import com.hero.zhaoq.oschinademo1_7.bean.CommentList;
+import com.hero.zhaoq.oschinademo1_7.bean.News;
 import com.hero.zhaoq.oschinademo1_7.bean.NewsList;
 import com.hero.zhaoq.oschinademo1_7.bean.Result;
 import com.hero.zhaoq.oschinademo1_7.bean.URLs;
@@ -75,8 +79,6 @@ public class ApiClient {
                 httpGet = getHttpGet(url, cookie, userAgent);
                 int statusCode = httpClient.executeMethod(httpGet);
 
-                Log.i("info",statusCode+"-------------");
-
                 if(statusCode != HttpStatus.SC_OK){ //未连接成功  200
                     throw AppException.http(statusCode); //抛出异常
                 }
@@ -142,22 +144,7 @@ public class ApiClient {
     private final static int TIMEOUT_CONNECTION = 20000;//连接超时  时间
     private final static int TIMEOUT_SOCKET = 20000; //读取  超时时间
 
-    //获取   http请求基本信息：
-    private static HttpClient getHttpClinet() {
-        HttpClient httpClient = new HttpClient();
-        //设置 HttpClient 接收Cookie 用于浏览器  一样的策略  设置策略
-        httpClient.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
-        //设置  默认的超时  重试 处理策略
-        httpClient.getParams().setParameter(
-                HttpMethodParams.RETRY_HANDLER,new DefaultHttpMethodRetryHandler());
-        //设置 连接 超时时间
-        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(TIMEOUT_CONNECTION);
-        //设置  读取数据超时时间
-        httpClient.getHttpConnectionManager().getParams().setSoTimeout(TIMEOUT_SOCKET);
-        //设置  字符集：
-        httpClient.getParams().setContentCharset(UTF_8);
-        return httpClient;
-    }
+
 
     private static String appUserAgent;  //请求 信息
 
@@ -232,6 +219,34 @@ public class ApiClient {
     }
 
     /**
+     * 获取评论列表
+     * @param catalog 1新闻  2帖子  3动弹  4动态
+     * @param id
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     * @throws AppException
+     * public final static String COMMENT_LIST = http://www.oschina.net/action/api/comment_list;
+     */
+    public static CommentList getCommentList(AppContext appContext, final int catalog, final int id, final int pageIndex, final int pageSize) throws AppException {
+        String newUrl = _MakeURL(URLs.COMMENT_LIST, new HashMap<String, Object>(){{
+            put("catalog", catalog);
+            put("id", id);
+            put("pageIndex", pageIndex);
+            put("pageSize", pageSize);
+        }});
+        Log.i("info","获取评论列表:http://www.oschina.net/action/api/comment_list/"+newUrl);
+        try{
+            return CommentList.parse(http_get(appContext, newUrl));
+        }catch(Exception e){
+            if(e instanceof AppException)
+                throw (AppException)e;
+            throw AppException.network(e);
+        }
+
+    }
+
+    /**
      * 获取   最新博客信息
      * @param appContext
      * @param pageIndex
@@ -247,6 +262,100 @@ public class ApiClient {
 
         try{
             return BlogList.parse(http_get(appContext, newUrl));
+        }catch(Exception e){
+            if(e instanceof AppException)
+                throw (AppException)e;
+            throw AppException.network(e);
+        }
+    }
+
+    //获取   http请求基本信息：
+    private static HttpClient getHttpClinet() {
+        HttpClient httpClient = new HttpClient();
+        //设置 HttpClient 接收Cookie 用于浏览器  一样的策略  设置策略
+        httpClient.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
+        //设置  默认的超时  重试 处理策略
+        httpClient.getParams().setParameter(
+                HttpMethodParams.RETRY_HANDLER,new DefaultHttpMethodRetryHandler());
+        //设置 连接 超时时间
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(TIMEOUT_CONNECTION);
+        //设置  读取数据超时时间
+        httpClient.getHttpConnectionManager().getParams().setSoTimeout(TIMEOUT_SOCKET);
+        //设置  字符集：
+        httpClient.getParams().setContentCharset(UTF_8);
+        return httpClient;
+    }
+
+    /**
+     * 获取网络图片
+     * @param url
+     * @return
+     */
+    public static Bitmap getNetBitmap(String url) throws AppException {
+        //System.out.println("image_url==> "+url);
+        HttpClient httpClient = null;
+        GetMethod httpGet = null;
+        Bitmap bitmap = null;
+        int time = 0;
+        do{
+            try
+            {
+                httpClient = getHttpClinet();
+                httpGet = getHttpGet(url, null, null);
+                int statusCode = httpClient.executeMethod(httpGet);
+                if (statusCode != HttpStatus.SC_OK) {
+                    throw AppException.http(statusCode);
+                }
+                InputStream inStream = httpGet.getResponseBodyAsStream();
+                bitmap = BitmapFactory.decodeStream(inStream);
+                inStream.close();
+                break;
+            } catch (HttpException e) {
+                time++;
+                if(time < RETRY_TIME) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {}
+                    continue;
+                }
+                // 发生致命的异常，可能是协议不对或者返回的内容有问题
+                e.printStackTrace();
+                throw AppException.http(e);
+            } catch (IOException e) {
+                time++;
+                if(time < RETRY_TIME) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {}
+                    continue;
+                }
+                // 发生网络异常
+                e.printStackTrace();
+                throw AppException.network(e);
+            } finally {
+                // 释放连接
+                httpGet.releaseConnection();
+                httpClient = null;
+            }
+        }while(time < RETRY_TIME);
+        return bitmap;
+    }
+
+
+    /**
+     * 获取资讯的详情
+     * @param news_id
+     * @return
+     * http://www.oschina.net/action/api/news_detail?id=76850
+     * @throws AppException
+     */
+    public static News getNewsDetail(AppContext appContext, final int news_id) throws AppException {
+        String newUrl = _MakeURL(URLs.NEWS_DETAIL, new HashMap<String, Object>(){{
+            put("id", news_id);
+        }});
+
+        try{
+            return News.parse(http_get(appContext, newUrl));
         }catch(Exception e){
             if(e instanceof AppException)
                 throw (AppException)e;
